@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project @ EV Eng</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f1117; --surface:#1a1d27; --surface2:#222636; --surface3:#2a2f45;
+  --border:#2e3348; --accent:#4f80ff; --accent2:#7c5cfc;
+  --green:#22c55e; --yellow:#f59e0b; --red:#ef4444; --orange:#f97316;
+  --text:#e8eaf0; --text2:#8b90a7; --text3:#565c78; --radius:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ===== AUTH SCREEN ===== */
+#auth-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);position:relative;overflow:hidden;}
+#auth-screen::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(79,128,255,.08),transparent 70%);top:-100px;left:-100px;pointer-events:none;}
+#auth-screen::after{content:'';position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(124,92,252,.06),transparent 70%);bottom:-50px;right:-50px;pointer-events:none;}
+.auth-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:420px;max-width:92vw;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.5);animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.auth-header{padding:32px 32px 24px;text-align:center;border-bottom:1px solid var(--border);}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;}
+.auth-logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+.auth-logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;}
+.auth-logo-text span{color:var(--accent);}
+.auth-tabs{display:flex;background:var(--surface2);border-radius:8px;padding:3px;gap:3px;}
+.auth-tab{flex:1;padding:8px;border-radius:6px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:.15s;font-family:'DM Sans',sans-serif;}
+.auth-tab.active{background:var(--surface3);color:var(--text);}
+.auth-body{padding:28px 32px 32px;}
+.auth-form{display:flex;flex-direction:column;gap:14px;}
+.auth-field label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.auth-field input, .auth-field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;transition:.15s;font-family:'DM Sans',sans-serif;}
+.auth-field input:focus,.auth-field select:focus{border-color:var(--accent);}
+.auth-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.auth-btn{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:'DM Sans',sans-serif;margin-top:4px;}
+.auth-btn:hover{background:#3d6ee8;}
+.auth-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;display:none;}
+.auth-err.show{display:block;}
+.auth-hint{text-align:center;font-size:12px;color:var(--text3);margin-top:12px;}
+.auth-hint strong{color:var(--text2);}
+.role-pills{display:flex;gap:8px;flex-wrap:wrap;}
+.role-pill{flex:1;padding:9px 8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;font-size:12px;font-weight:500;transition:.15s;color:var(--text2);}
+.role-pill.selected{border-color:var(--accent);color:var(--accent);background:rgba(79,128,255,.08);}
+.role-pill .rp-icon{font-size:18px;display:block;margin-bottom:4px;}
+
+/* ===== APP ===== */
+#app-screen{display:none;}
+.app{display:flex;height:100vh;}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
+.content{flex:1;overflow:auto;padding:24px;}
+
+/* sidebar */
+.logo{padding:18px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.logo-text{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;letter-spacing:-0.3px;}
+.logo-text span{color:var(--accent);}
+.nav{padding:12px 8px;flex:1;overflow-y:auto;}
+.nav-section{margin-bottom:20px;}
+.nav-label{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;padding:0 12px;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--text2);transition:all .15s;position:relative;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:linear-gradient(90deg,rgba(79,128,255,.15),rgba(124,92,252,.08));color:var(--accent);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;height:60%;width:3px;background:var(--accent);border-radius:0 3px 3px 0;}
+.nav-item.disabled{opacity:.4;pointer-events:none;}
+.nav-icon{font-size:16px;width:20px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+.project-list{padding:8px;border-top:1px solid var(--border);}
+.project-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;}
+.project-item:hover{background:var(--surface2);color:var(--text);}
+.proj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* user-info in sidebar */
+.sidebar-user{padding:12px;border-top:1px solid var(--border);}
+.sidebar-user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:var(--surface2);}
+.su-info{flex:1;min-width:0;}
+.su-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.su-role{font-size:11px;color:var(--text2);}
+.su-actions{display:flex;flex-direction:column;gap:4px;}
+.su-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;padding:2px 4px;border-radius:4px;transition:.15s;}
+.su-btn:hover{color:var(--text);background:var(--surface3);}
+
+/* topbar */
+.tb-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:16px;}
+.tb-spacer{flex:1;}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;width:220px;}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;}
+.search-box input::placeholder{color:var(--text3);}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#3d6ee8;}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+.btn-danger:hover{background:rgba(239,68,68,.25);}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;cursor:pointer;flex-shrink:0;}
+
+/* views */
+.view{display:none;}
+.view.active{display:block;}
+
+/* stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.stat-label{font-size:12px;color:var(--text2);margin-bottom:8px;}
+.stat-value{font-size:28px;font-weight:700;font-family:'Space Grotesk',sans-serif;letter-spacing:-1px;}
+.stat-sub{font-size:12px;color:var(--text3);margin-top:4px;}
+.stat-card.blue .stat-value{color:var(--accent);}
+.stat-card.green .stat-value{color:var(--green);}
+.stat-card.yellow .stat-value{color:var(--yellow);}
+.stat-card.red .stat-value{color:var(--red);}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-title{font-size:15px;font-weight:600;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+
+/* project cards */
+.project-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.project-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.project-card.blue::before{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.project-card.green::before{background:linear-gradient(90deg,var(--green),#16a34a);}
+.project-card.orange::before{background:linear-gradient(90deg,var(--orange),#ea580c);}
+.project-card.purple::before{background:linear-gradient(90deg,var(--accent2),#6d28d9);}
+.project-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3);}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.pc-name{font-weight:600;font-size:15px;margin-bottom:4px;}
+.pc-location{font-size:12px;color:var(--text2);}
+.pc-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;}
+.badge-active{background:rgba(34,197,94,.15);color:var(--green);}
+.badge-paused{background:rgba(245,158,11,.15);color:var(--yellow);}
+.badge-done{background:rgba(99,102,241,.15);color:#818cf8;}
+.pc-progress{margin:14px 0;}
+.pc-progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:6px;}
+.progress-bar{background:var(--surface3);border-radius:4px;height:6px;}
+.progress-fill{height:100%;border-radius:4px;transition:width .4s;}
+.pc-meta{display:flex;gap:16px;font-size:12px;color:var(--text2);}
+.pc-meta span{display:flex;align-items:center;gap:4px;}
+.avatars{display:flex;}
+.avatars .avatar{width:24px;height:24px;font-size:10px;margin-left:-6px;border:2px solid var(--surface);}
+.avatars .avatar:first-child{margin-left:0;}
+
+/* tasks kanban */
+.task-columns{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.task-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.col-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.col-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.col-count{background:var(--surface3);color:var(--text2);font-size:11px;padding:2px 8px;border-radius:20px;}
+.col-tasks{padding:12px;display:flex;flex-direction:column;gap:8px;min-height:200px;}
+.task-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;}
+.task-card:hover{border-color:var(--accent);}
+.task-title{font-size:13px;font-weight:500;margin-bottom:8px;}
+.task-meta{display:flex;align-items:center;justify-content:space-between;}
+.priority{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px;}
+.prio-high{background:rgba(239,68,68,.15);color:var(--red);}
+.prio-med{background:rgba(245,158,11,.15);color:var(--yellow);}
+.prio-low{background:rgba(34,197,94,.15);color:var(--green);}
+.task-date{font-size:11px;color:var(--text3);}
+.task-assigned{font-size:11px;color:var(--text3);margin-top:4px;}
+.add-task-btn{margin:8px 12px 12px;padding:8px;border:1.5px dashed var(--border);border-radius:8px;background:transparent;color:var(--text3);font-size:13px;cursor:pointer;width:calc(100% - 24px);transition:.15s;font-family:'DM Sans',sans-serif;}
+.add-task-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+/* plans */
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.plan-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .2s;}
+.plan-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.plan-thumb{height:140px;background:var(--surface2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.plan-info{padding:14px;}
+.plan-name{font-weight:600;font-size:14px;margin-bottom:4px;}
+.plan-sub{font-size:12px;color:var(--text2);}
+.plan-pins{display:flex;gap:8px;margin-top:10px;}
+.pin-badge{font-size:11px;padding:3px 8px;border-radius:4px;}
+.pin-open{background:rgba(239,68,68,.15);color:var(--red);}
+.pin-closed{background:rgba(34,197,94,.15);color:var(--green);}
+
+/* === USERS TABLE VIEW === */
+.users-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.users-table{width:100%;border-collapse:collapse;}
+.users-table th{padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.users-table td{padding:14px 16px;font-size:13px;border-bottom:1px solid var(--border);}
+.users-table tr:last-child td{border-bottom:none;}
+.users-table tr:hover td{background:var(--surface2);}
+.role-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.role-admin{background:rgba(239,68,68,.12);color:var(--red);}
+.role-manager{background:rgba(79,128,255,.12);color:var(--accent);}
+.role-worker{background:rgba(34,197,94,.12);color:var(--green);}
+.role-viewer{background:rgba(139,144,167,.12);color:var(--text2);}
+.status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px;}
+.status-active{background:var(--green);}
+.status-inactive{background:var(--text3);}
+.user-cell{display:flex;align-items:center;gap:10px;}
+.table-actions{display:flex;gap:6px;}
+.icon-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:5px 7px;border-radius:6px;transition:.15s;}
+.icon-btn:hover{background:var(--surface3);color:var(--text);}
+.icon-btn.del:hover{background:rgba(239,68,68,.1);color:var(--red);}
+
+/* team cards */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.member-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:14px;}
+.member-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;}
+.member-name{font-weight:600;font-size:14px;margin-bottom:4px;}
+.member-role{font-size:12px;color:var(--text2);}
+.member-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--green);margin-top:6px;}
+.member-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);}
+.member-status.away{color:var(--yellow);}
+.member-status.away::before{background:var(--yellow);}
+
+/* modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;width:520px;max-width:90vw;max-height:90vh;overflow-y:auto;animation:modalIn .2s ease;}
+@keyframes modalIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1;}
+.modal-title{font-size:16px;font-weight:600;}
+.modal-close{background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1;}
+.modal-body{padding:24px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.field input,.field select,.field textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;outline:none;font-family:'DM Sans',sans-serif;transition:.15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);}
+.field textarea{resize:vertical;min-height:80px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--surface);}
+
+/* profile dropdown */
+.profile-menu{position:absolute;right:16px;top:56px;background:var(--surface);border:1px solid var(--border);border-radius:10px;width:220px;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:500;display:none;animation:modalIn .15s ease;}
+.profile-menu.open{display:block;}
+.pm-header{padding:14px 16px;border-bottom:1px solid var(--border);}
+.pm-name{font-weight:600;font-size:14px;}
+.pm-email{font-size:12px;color:var(--text2);margin-top:2px;}
+.pm-role{margin-top:6px;}
+.pm-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:13px;color:var(--text2);transition:.15s;}
+.pm-item:hover{background:var(--surface2);color:var(--text);}
+.pm-item.danger{color:var(--red);}
+.pm-item.danger:hover{background:rgba(239,68,68,.08);}
+.pm-divider{height:1px;background:var(--border);margin:4px 0;}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;font-size:14px;display:flex;align-items:center;gap:10px;z-index:2000;transform:translateY(80px);opacity:0;transition:all .3s;box-shadow:0 8px 32px rgba(0,0,0,.4);}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* access denied */
+.access-denied{text-align:center;padding:80px 20px;color:var(--text2);}
+.access-denied .icon{font-size:52px;margin-bottom:16px;}
+.access-denied h3{font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.access-denied p{font-size:14px;}
+
+/* permission badge in topbar */
+.perm-badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;}
+
+/* ===== REPORTS ===== */
+.report-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;}
+.report-controls label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-right:4px;}
+.report-controls input,.report-controls select{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:13px;outline:none;font-family:'DM Sans',sans-serif;}
+.report-controls input:focus,.report-controls select:focus{border-color:var(--accent);}
+.rc-sep{width:1px;height:24px;background:var(--border);}
+
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.sum-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:14px;}
+.sum-icon{font-size:26px;width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sum-icon.blue{background:rgba(79,128,255,.12);}
+.sum-icon.green{background:rgba(34,197,94,.12);}
+.sum-icon.red{background:rgba(239,68,68,.12);}
+.sum-icon.yellow{background:rgba(245,158,11,.12);}
+.sum-val{font-size:26px;font-weight:700;font-family:'Space Grotesk',sans-serif;letter-spacing:-1px;}
+.sum-val.blue{color:var(--accent);}
+.sum-val.green{color:var(--green);}
+.sum-val.red{color:var(--red);}
+.sum-val.yellow{color:var(--yellow);}
+.sum-lbl{font-size:12px;color:var(--text2);margin-top:2px;}
+
+.perf-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px;}
+.perf-table-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.perf-table-title{font-size:15px;font-weight:600;}
+.perf-table{width:100%;border-collapse:collapse;}
+.perf-table th{padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--surface2);white-space:nowrap;}
+.perf-table td{padding:14px 16px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.perf-table tr:last-child td{border-bottom:none;}
+.perf-table tr:hover td{background:var(--surface2);}
+
+.perf-bar-wrap{display:flex;align-items:center;gap:10px;}
+.perf-bar-bg{flex:1;background:var(--surface3);border-radius:4px;height:8px;min-width:80px;}
+.perf-bar-fill{height:100%;border-radius:4px;transition:width .5s;}
+.perf-bar-label{font-size:12px;font-weight:600;width:38px;text-align:right;flex-shrink:0;}
+
+.mini-breakdown{display:flex;gap:6px;flex-wrap:wrap;}
+.mb-chip{font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;}
+.mb-open{background:rgba(139,144,167,.12);color:var(--text2);}
+.mb-prog{background:rgba(79,128,255,.12);color:var(--accent);}
+.mb-rev{background:rgba(245,158,11,.12);color:var(--yellow);}
+.mb-done{background:rgba(34,197,94,.12);color:var(--green);}
+.mb-over{background:rgba(239,68,68,.12);color:var(--red);}
+
+.rank-badge{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.rank-1{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;}
+.rank-2{background:linear-gradient(135deg,#94a3b8,#64748b);color:#fff;}
+.rank-3{background:linear-gradient(135deg,#f97316,#c2410c);color:#fff;}
+.rank-n{background:var(--surface3);color:var(--text2);}
+
+/* detail panel */
+.user-detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;}
+.udc-top{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.udc-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0;}
+.udc-name{font-size:18px;font-weight:700;margin-bottom:4px;}
+.udc-meta{font-size:13px;color:var(--text2);}
+.udc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.udc-stat{background:var(--surface2);border-radius:8px;padding:14px;text-align:center;}
+.udc-stat-val{font-size:22px;font-weight:700;font-family:'Space Grotesk',sans-serif;}
+.udc-stat-lbl{font-size:11px;color:var(--text2);margin-top:4px;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:16px;padding:6px 0;}
+.back-btn:hover{color:var(--text);}
+
+.proj-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.proj-tag{font-size:11px;padding:3px 8px;border-radius:4px;background:var(--surface3);color:var(--text2);}
+
+@media(max-width:900px){.summary-grid{grid-template-columns:1fr 1fr;}.udc-stats{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){.summary-grid{grid-template-columns:1fr 1fr;}.report-controls{flex-direction:column;align-items:flex-start;}}
+
+  .task-columns{grid-template-columns:1fr 1fr;}
+  .plans-grid{grid-template-columns:1fr 1fr;}
+  .team-grid{grid-template-columns:1fr 1fr;}
+  .two-col{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .sidebar{display:none;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .task-columns{grid-template-columns:1fr;}
+  .plans-grid{grid-template-columns:1fr;}
+  .team-grid{grid-template-columns:1fr;}
+}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- ===== AUTH SCREEN ===== -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🏗️</div>
+        <div class="auth-logo-text">Project <span>@ EV Eng</span></div>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login',this)">Hyr</button>
+        <button class="auth-tab" onclick="switchAuthTab('register',this)">Regjistrohu</button>
+      </div>
+    </div>
+    <div class="auth-body">
+      <!-- LOGIN -->
+      <div id="tab-login" class="auth-form">
+        <div class="auth-err" id="login-err">Email ose fjalëkalim i gabuar.</div>
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="l-email" placeholder="emri@kompania.al" value="admin@buildflow.al">
+        </div>
+        <div class="auth-field">
+          <label>Fjalëkalimi</label>
+          <input type="password" id="l-pass" placeholder="••••••••" value="admin123">
+        </div>
+        <button class="auth-btn" onclick="doLogin()">Hyr në llogari →</button>
+        <div class="auth-hint">
+          Demo: <strong>admin@buildflow.al / admin123</strong><br>
+          ose <strong>worker@buildflow.al / worker123</strong>
+        </div>
+      </div>
+      <!-- REGISTER -->
+      <div id="tab-register" class="auth-form" style="display:none">
+        <div class="auth-err" id="reg-err"></div>
+        <div class="auth-field-row">
+          <div class="auth-field">
+            <label>Emri</label>
+            <input type="text" id="r-fname" placeholder="Emri">
+          </div>
+          <div class="auth-field">
+            <label>Mbiemri</label>
+            <input type="text" id="r-lname" placeholder="Mbiemri">
+          </div>
+        </div>
+        <div class="auth-field">
+          <label>Email</label>
+          <input type="email" id="r-email" placeholder="emri@kompania.al">
+        </div>
+        <div class="auth-field">
+          <label>Fjalëkalimi</label>
+          <input type="password" id="r-pass" placeholder="Min. 6 karaktere">
+        </div>
+        <div class="auth-field">
+          <label>Roli</label>
+          <div class="role-pills">
+            <div class="role-pill selected" onclick="selectRole('manager',this)">
+              <span class="rp-icon">👷</span>Menaxher
+            </div>
+            <div class="role-pill" onclick="selectRole('worker',this)">
+              <span class="rp-icon">🔧</span>Punonjës
+            </div>
+            <div class="role-pill" onclick="selectRole('viewer',this)">
+              <span class="rp-icon">👁️</span>Vëzhgues
+            </div>
+          </div>
+        </div>
+        <button class="auth-btn" onclick="doRegister()">Krijo llogarinë →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APP SCREEN ===== -->
+<div id="app-screen">
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-icon">🏗️</div>
+      <div class="logo-text">Project <span>@ EV Eng</span></div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">
+        <div class="nav-label">Kryefaqja</div>
+        <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard',this)">
+          <span class="nav-icon">📊</span> Paneli
+        </div>
+        <div class="nav-item" id="nav-projects" onclick="switchView('projects',this)">
+          <span class="nav-icon">🏢</span> Projektet
+          <span class="nav-badge">4</span>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Puna</div>
+        <div class="nav-item" id="nav-tasks" onclick="switchView('tasks',this)">
+          <span class="nav-icon">✅</span> Detyrat
+          <span class="nav-badge" id="nav-tasks-badge">12</span>
+        </div>
+        <div class="nav-item" id="nav-plans" onclick="switchView('plans',this)">
+          <span class="nav-icon">📐</span> Planet
+        </div>
+        <div class="nav-item" id="nav-team" onclick="switchView('team',this)">
+          <span class="nav-icon">👥</span> Ekipi
+        </div>
+      </div>
+      <div class="nav-section" id="admin-nav-section">
+        <div class="nav-label">Admin</div>
+        <div class="nav-item" id="nav-users" onclick="switchView('users',this)">
+          <span class="nav-icon">🔑</span> Përdoruesit
+          <span class="nav-badge" id="users-badge">0</span>
+        </div>
+        <div class="nav-item" id="nav-reports" onclick="switchView('reports',this)">
+          <span class="nav-icon">📈</span> Raportet
+        </div>
+      </div>
+    </nav>
+    <div class="project-list">
+      <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text3);text-transform:uppercase;padding:0 12px 8px;">Projektet aktive</div>
+      <div class="project-item" onclick="switchView('tasks',null)"><div class="proj-dot" style="background:var(--accent)"></div> Pallati Tirana</div>
+      <div class="project-item" onclick="switchView('tasks',null)"><div class="proj-dot" style="background:var(--green)"></div> Shkolla Durrës</div>
+      <div class="project-item" onclick="switchView('tasks',null)"><div class="proj-dot" style="background:var(--orange)"></div> Hotel Sarandë</div>
+      <div class="project-item" onclick="switchView('tasks',null)"><div class="proj-dot" style="background:var(--accent2)"></div> Rruga Korçë</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-user-card">
+        <div class="avatar" id="sidebar-av" style="width:36px;height:36px;font-size:14px;flex-shrink:0;">AK</div>
+        <div class="su-info">
+          <div class="su-name" id="sidebar-name">Artan K.</div>
+          <div class="su-role" id="sidebar-role">Admin</div>
+        </div>
+        <div class="su-actions">
+          <button class="su-btn" title="Profili" onclick="toggleProfileMenu()">⚙️</button>
+          <button class="su-btn" title="Dil" onclick="doLogout()">🚪</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-title" id="topbar-title">Paneli</div>
+      <span class="perm-badge role-admin" id="topbar-role-badge" style="display:none"></span>
+      <div class="tb-spacer"></div>
+      <div class="search-box">
+        <span style="color:var(--text3)">🔍</span>
+        <input type="text" placeholder="Kërko..." id="searchInput" oninput="handleSearch(this.value)">
+      </div>
+      <button class="btn btn-primary" id="topbar-add-btn" onclick="openModal()">+ E Re</button>
+      <div class="avatar" id="topbar-av" onclick="toggleProfileMenu()">AK</div>
+    </div>
+
+    <!-- PROFILE DROPDOWN -->
+    <div class="profile-menu" id="profile-menu">
+      <div class="pm-header">
+        <div class="pm-name" id="pm-name">Artan Kelmendi</div>
+        <div class="pm-email" id="pm-email">admin@buildflow.al</div>
+        <div class="pm-role"><span class="role-tag role-admin" id="pm-role-tag">🔑 Admin</span></div>
+      </div>
+      <div class="pm-item" onclick="openProfileModal();toggleProfileMenu()">✏️ &nbsp;Ndrysho Profilin</div>
+      <div class="pm-item" onclick="openPasswordModal();toggleProfileMenu()">🔒 &nbsp;Ndrysho Fjalëkalimin</div>
+      <div class="pm-item" onclick="switchView('reports',document.getElementById('nav-reports'));renderUserDetail(currentUser.id);toggleProfileMenu()">📈 &nbsp;Raporti Im</div>
+      <div class="pm-divider"></div>
+      <div class="pm-item danger" onclick="doLogout()">🚪 &nbsp;Dil nga llogaria</div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="view active" id="view-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card blue"><div class="stat-label">Projektet Aktive</div><div class="stat-value">4</div><div class="stat-sub">↑ 1 muajin e kaluar</div></div>
+          <div class="stat-card yellow"><div class="stat-label">Detyra në Pritje</div><div class="stat-value" id="pending-count">12</div><div class="stat-sub">↑ 3 të reja sot</div></div>
+          <div class="stat-card green"><div class="stat-label">Të Përfunduara</div><div class="stat-value">87</div><div class="stat-sub">Ky muaj</div></div>
+          <div class="stat-card red"><div class="stat-label">Probleme Hapur</div><div class="stat-value">5</div><div class="stat-sub">↓ 2 nga java</div></div>
+        </div>
+        <div class="two-col">
+          <div>
+            <div class="section-header">
+              <div class="section-title">Projektet</div>
+              <button class="btn btn-ghost" onclick="switchView('projects',null)">Shiko të gjitha →</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;" id="dash-projects"></div>
+          </div>
+          <div>
+            <div class="section-header">
+              <div class="section-title">Detyrat e Fundit</div>
+              <button class="btn btn-ghost" onclick="switchView('tasks',null)">Të gjitha →</button>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;" id="dash-tasks"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div class="view" id="view-projects">
+        <div class="section-header">
+          <div class="section-title" style="font-size:18px">Projektet</div>
+          <button class="btn btn-primary" id="add-project-btn" onclick="openProjectModal()">+ Projekt i Ri</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;" id="projects-grid"></div>
+      </div>
+
+      <!-- TASKS -->
+      <div class="view" id="view-tasks">
+        <div class="section-header">
+          <div class="section-title" style="font-size:18px">Detyrat</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost">🔽 Filtro</button>
+            <button class="btn btn-primary" id="add-task-btn" onclick="openTaskModal()">+ Detyrë e Re</button>
+          </div>
+        </div>
+        <div class="task-columns" id="task-board"></div>
+      </div>
+
+      <!-- PLANS -->
+      <div class="view" id="view-plans">
+        <div class="section-header">
+          <div class="section-title" style="font-size:18px">Planet e Ndërtimit</div>
+          <button class="btn btn-primary" id="upload-plan-btn">📤 Ngarko Plan</button>
+        </div>
+        <div class="plans-grid" id="plans-grid"></div>
+      </div>
+
+      <!-- TEAM -->
+      <div class="view" id="view-team">
+        <div class="section-header">
+          <div class="section-title" style="font-size:18px">Anëtarët e Ekipit</div>
+          <button class="btn btn-primary" id="add-member-btn" onclick="openTeamModal()">+ Shto Anëtar</button>
+        </div>
+        <div class="team-grid" id="team-grid"></div>
+      </div>
+
+      <!-- USERS (Admin only) -->
+      <div class="view" id="view-users">
+        <div class="section-header">
+          <div class="section-title" style="font-size:18px">Menaxhimi i Përdoruesve</div>
+          <button class="btn btn-primary" onclick="openAddUserModal()">+ Shto Përdorues</button>
+        </div>
+        <div id="users-content"></div>
+      </div>
+
+      <!-- REPORTS (Admin/Manager) -->
+      <div class="view" id="view-reports">
+        <div id="reports-main"><!-- injected --></div>
+        <div id="reports-detail" style="display:none"><!-- injected --></div>
+      </div>
+
+    </div>
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">E Re</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Anulo</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveModal()">Ruaj</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toast-icon">✅</span><span id="toast-msg">U ruajt!</span></div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+let users = [
+  { id:1, fname:'Artan', lname:'Kelmendi', email:'admin@buildflow.al', pass:'admin123', role:'admin', status:'active', created:'01/06/2026' },
+  { id:2, fname:'Blerina', lname:'Emini', email:'manager@buildflow.al', pass:'manager123', role:'manager', status:'active', created:'02/06/2026' },
+  { id:3, fname:'Çlirim', lname:'Morina', email:'worker@buildflow.al', pass:'worker123', role:'worker', status:'active', created:'03/06/2026' },
+  { id:4, fname:'Driton', lname:'Loxha', email:'viewer@buildflow.al', pass:'viewer123', role:'viewer', status:'inactive', created:'04/06/2026' },
+];
+
+let currentUser = null;
+let selectedRole = 'manager';
+let editingUserId = null;
+
+const projects = [
+  { id:1, name:'Pallati Tirana', location:'Tiranë', status:'active', progress:65, color:'blue', tasks:34, issues:2, members:['AK','BE','CM'] },
+  { id:2, name:'Shkolla Durrës', location:'Durrës', status:'active', progress:40, color:'green', tasks:28, issues:3, members:['DL','FN'] },
+  { id:3, name:'Hotel Sarandë', location:'Sarandë', status:'paused', progress:20, color:'orange', tasks:15, issues:0, members:['GH','IJ'] },
+  { id:4, name:'Rruga Korçë', location:'Korçë', status:'done', progress:100, color:'purple', tasks:52, issues:0, members:['MN','OP'] },
+];
+
+const columns = ['Hapur','Në Progres','Rishikim','Mbyllur'];
+const colColors = ['var(--text3)','var(--accent)','var(--yellow)','var(--green)'];
+
+let tasks = [
+  { id:1, title:'Armatura kati 3', col:1, prio:'high', date:'10 Qer', proj:'Pallati Tirana', assignedTo:1 },
+  { id:2, title:'Inspektim betoni', col:1, prio:'med', date:'12 Qer', proj:'Pallati Tirana', assignedTo:3 },
+  { id:3, title:'Instalim dritareve', col:1, prio:'low', date:'15 Qer', proj:'Pallati Tirana', assignedTo:3 },
+  { id:4, title:'Lyerje fasade', col:2, prio:'med', date:'8 Qer', proj:'Shkolla Durrës', assignedTo:2 },
+  { id:5, title:'Kontrolli i hidraulikës', col:2, prio:'high', date:'9 Qer', proj:'Pallati Tirana', assignedTo:3 },
+  { id:6, title:'Asfaltim parkingu', col:2, prio:'low', date:'11 Qer', proj:'Hotel Sarandë', assignedTo:3 },
+  { id:7, title:'Dokumentimi i planit', col:3, prio:'high', date:'7 Qer', proj:'Rruga Korçë', assignedTo:2 },
+  { id:8, title:'Raport final', col:3, prio:'med', date:'6 Qer', proj:'Pallati Tirana', assignedTo:2 },
+  { id:9, title:'Dorëzimi i çelësave', col:4, prio:'low', date:'5 Qer', proj:'Rruga Korçë', assignedTo:1 },
+  { id:10, title:'Nënshkrim kontrate', col:4, prio:'high', date:'3 Qer', proj:'Hotel Sarandë', assignedTo:1 },
+];
+
+const plans = [
+  { name:'Kati Perdhe - A1', version:'v3.2', updated:'2 ditë më parë', open:3, closed:12 },
+  { name:'Kati 1 - B2', version:'v2.0', updated:'1 javë më parë', open:1, closed:8 },
+  { name:'Seksioni Strukturor', version:'v5.1', updated:'3 ditë më parë', open:0, closed:20 },
+  { name:'Elektrik - MEP', version:'v1.4', updated:'sot', open:4, closed:5 },
+  { name:'Hidraulik - PLB', version:'v2.8', updated:'4 ditë më parë', open:2, closed:15 },
+  { name:'Fasada Veriore', version:'v1.0', updated:'1 muaj më parë', open:1, closed:3 },
+];
+
+let members = [
+  { name:'Artan Kelmendi', role:'Menaxher Projekti', initials:'AK', color:'#4f80ff', status:'online' },
+  { name:'Blerina Emini', role:'Inxhinier Civil', initials:'BE', color:'#22c55e', status:'online' },
+  { name:'Çlirim Morina', role:'Arkitekt', initials:'CM', color:'#f59e0b', status:'away' },
+  { name:'Driton Loxha', role:'Mbikëqyrës', initials:'DL', color:'#ef4444', status:'online' },
+  { name:'Fatmire Nushi', role:'Inxhinier Elektrik', initials:'FN', color:'#7c5cfc', status:'away' },
+  { name:'Gentian Hoxha', role:'Kontraktor', initials:'GH', color:'#f97316', status:'online' },
+];
+
+let currentModal = '';
+let currentView = 'dashboard';
+
+// ============================================================
+// PERMISSIONS
+// ============================================================
+const PERMS = {
+  admin:   { canManageUsers:true, canAddProject:true, canAddTask:true, canEditTask:true, canViewPlans:true, canUploadPlan:true, canManageTeam:true },
+  manager: { canManageUsers:false, canAddProject:true, canAddTask:true, canEditTask:true, canViewPlans:true, canUploadPlan:true, canManageTeam:true },
+  worker:  { canManageUsers:false, canAddProject:false, canAddTask:true, canEditTask:false, canViewPlans:true, canUploadPlan:false, canManageTeam:false },
+  viewer:  { canManageUsers:false, canAddProject:false, canAddTask:false, canEditTask:false, canViewPlans:true, canUploadPlan:false, canManageTeam:false },
+};
+
+function can(perm) { return currentUser && PERMS[currentUser.role] && PERMS[currentUser.role][perm]; }
+
+function initials(u) { return (u.fname[0]+u.lname[0]).toUpperCase(); }
+function fullname(u) { return u.fname+' '+u.lname; }
+const roleColors = { admin:'role-admin', manager:'role-manager', worker:'role-worker', viewer:'role-viewer' };
+const roleLabels = { admin:'🔑 Admin', manager:'👷 Menaxher', worker:'🔧 Punonjës', viewer:'👁️ Vëzhgues' };
+const avatarColors = ['#4f80ff','#22c55e','#f59e0b','#ef4444','#7c5cfc','#f97316','#06b6d4','#84cc16'];
+
+// ============================================================
+// AUTH
+// ============================================================
+function switchAuthTab(tab, el) {
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-login').style.display = tab==='login'?'flex':'none';
+  document.getElementById('tab-register').style.display = tab==='register'?'flex':'none';
+}
+
+function selectRole(role, el) {
+  selectedRole = role;
+  document.querySelectorAll('.role-pill').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function doLogin() {
+  const email = document.getElementById('l-email').value.trim().toLowerCase();
+  const pass = document.getElementById('l-pass').value;
+  const u = users.find(u=>u.email.toLowerCase()===email && u.pass===pass);
+  const err = document.getElementById('login-err');
+  if(!u) { err.classList.add('show'); return; }
+  if(u.status==='inactive') { err.textContent='Llogaria juaj është çaktivizuar.'; err.classList.add('show'); return; }
+  err.classList.remove('show');
+  loginAs(u);
+}
+
+function doRegister() {
+  const fname = document.getElementById('r-fname').value.trim();
+  const lname = document.getElementById('r-lname').value.trim();
+  const email = document.getElementById('r-email').value.trim().toLowerCase();
+  const pass = document.getElementById('r-pass').value;
+  const err = document.getElementById('reg-err');
+  err.classList.remove('show');
+  if(!fname||!lname) { err.textContent='Shkruaj emrin dhe mbiemrin.'; err.classList.add('show'); return; }
+  if(!email||!/\S+@\S+\.\S+/.test(email)) { err.textContent='Email i pavlefshëm.'; err.classList.add('show'); return; }
+  if(pass.length<6) { err.textContent='Fjalëkalimi duhet të ketë minimum 6 karaktere.'; err.classList.add('show'); return; }
+  if(users.find(u=>u.email.toLowerCase()===email)) { err.textContent='Ky email ekziston tashmë.'; err.classList.add('show'); return; }
+  const nu = { id:Date.now(), fname, lname, email, pass, role:selectedRole, status:'active', created:new Date().toLocaleDateString('sq-AL') };
+  users.push(nu);
+  loginAs(nu);
+}
+
+function loginAs(u) {
+  currentUser = u;
+  setupAppForUser();
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('app-screen').style.display='block';
+  switchView('dashboard', document.getElementById('nav-dashboard'));
+  showToast('Mirë se erdhe, '+u.fname+'! 👋','✅');
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('app-screen').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+  document.getElementById('profile-menu').classList.remove('open');
+  document.getElementById('l-email').value='admin@buildflow.al';
+  document.getElementById('l-pass').value='admin123';
+  showToast('Dole nga llogaria.','👋');
+}
+
+function setupAppForUser() {
+  const u = currentUser;
+  const av = initials(u);
+  const color = avatarColors[u.id % avatarColors.length];
+  // sidebar
+  document.getElementById('sidebar-av').textContent = av;
+  document.getElementById('sidebar-av').style.background = color;
+  document.getElementById('sidebar-name').textContent = u.fname+' '+u.lname[0]+'.';
+  document.getElementById('sidebar-role').textContent = roleLabels[u.role].replace(/^./,'');
+  // topbar avatar
+  document.getElementById('topbar-av').textContent = av;
+  document.getElementById('topbar-av').style.background = color;
+  const badge = document.getElementById('topbar-role-badge');
+  badge.textContent = roleLabels[u.role];
+  badge.className = 'perm-badge '+roleColors[u.role];
+  badge.style.display = 'inline-flex';
+  // profile menu
+  document.getElementById('pm-name').textContent = fullname(u);
+  document.getElementById('pm-email').textContent = u.email;
+  const pmrt = document.getElementById('pm-role-tag');
+  pmrt.textContent = roleLabels[u.role];
+  pmrt.className = 'role-tag '+roleColors[u.role];
+  // admin section — visible to admin & manager
+  document.getElementById('admin-nav-section').style.display = (u.role==='admin'||u.role==='manager')?'block':'none';
+  document.getElementById('nav-users').style.display = can('canManageUsers')?'flex':'none';
+  // users badge
+  document.getElementById('users-badge').textContent = users.length;
+}
+
+// ============================================================
+// PROFILE MENU
+// ============================================================
+function toggleProfileMenu() {
+  document.getElementById('profile-menu').classList.toggle('open');
+}
+document.addEventListener('click', e=>{
+  const pm = document.getElementById('profile-menu');
+  if(pm.classList.contains('open') && !pm.contains(e.target) && !document.getElementById('topbar-av').contains(e.target) && !document.querySelector('.su-btn') ) {
+    // only close if click is outside
+    if(!e.target.closest('#profile-menu') && !e.target.closest('#topbar-av') && !e.target.closest('.su-btn')) pm.classList.remove('open');
+  }
+});
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function switchView(view, navEl) {
+  if(navEl) {
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    navEl.classList.add('active');
+  }
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  const titles={dashboard:'Paneli',projects:'Projektet',tasks:'Detyrat',plans:'Planet',team:'Ekipi',users:'Përdoruesit',reports:'Raportet e Performancës'};
+  document.getElementById('topbar-title').textContent=titles[view]||view;
+  currentView=view;
+  const addBtn = document.getElementById('topbar-add-btn');
+  const viewsWithAdd = ['dashboard','projects','tasks','team'];
+  addBtn.style.display = viewsWithAdd.includes(view)?'':'none';
+  if(view==='dashboard') renderDashboard();
+  if(view==='projects') renderProjects();
+  if(view==='tasks') renderTasks();
+  if(view==='plans') renderPlans();
+  if(view==='team') renderTeam();
+  if(view==='users') renderUsers();
+  if(view==='reports') renderReports();
+}
+
+// ============================================================
+// RENDER HELPERS
+// ============================================================
+function projColorVar(c){return c==='blue'?'var(--accent)':c==='green'?'var(--green)':c==='orange'?'var(--orange)':'var(--accent2)';}
+function statusBadge(s){return s==='active'?`<span class="pc-badge badge-active">Aktiv</span>`:s==='paused'?`<span class="pc-badge badge-paused">Pezulluar</span>`:`<span class="pc-badge badge-done">Kompletuar</span>`;}
+function prioLabel(p){return p==='high'?'Lartë':p==='med'?'Mesme':'Ulët';}
+function userById(id){return users.find(u=>u.id===id);}
+
+function renderDashboard() {
+  document.getElementById('dash-projects').innerHTML=projects.slice(0,3).map(p=>`
+    <div class="project-card ${p.color}" onclick="switchView('tasks',document.getElementById('nav-tasks'))">
+      <div class="pc-top"><div><div class="pc-name">${p.name}</div><div class="pc-location">📍 ${p.location}</div></div>${statusBadge(p.status)}</div>
+      <div class="pc-progress"><div class="pc-progress-label"><span>Progresi</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${p.progress}%;background:${projColorVar(p.color)}"></div></div></div>
+      <div class="pc-meta"><span>📋 ${p.tasks}</span><span>⚠️ ${p.issues}</span><div class="avatars" style="margin-left:auto">${p.members.map(m=>`<div class="avatar">${m}</div>`).join('')}</div></div>
+    </div>`).join('');
+  document.getElementById('dash-tasks').innerHTML=tasks.slice(0,6).map(t=>{
+    const au=userById(t.assignedTo);
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;gap:12px;">
+      <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${t.prio==='high'?'var(--red)':t.prio==='med'?'var(--yellow)':'var(--green)'}"></div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:500">${t.title}</div><div style="font-size:11px;color:var(--text3)">${t.proj}${au?' · '+au.fname:''}</div></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><span class="priority prio-${t.prio}">${prioLabel(t.prio)}</span><span style="font-size:11px;color:var(--text3)">${t.date}</span></div>
+    </div>`;}).join('');
+}
+
+function renderProjects() {
+  const canAdd = can('canAddProject');
+  document.getElementById('add-project-btn').style.display = canAdd?'':'none';
+  document.getElementById('projects-grid').innerHTML=projects.map(p=>`
+    <div class="project-card ${p.color}">
+      <div class="pc-top"><div><div class="pc-name">${p.name}</div><div class="pc-location">📍 ${p.location}</div></div>${statusBadge(p.status)}</div>
+      <div class="pc-progress"><div class="pc-progress-label"><span>Progresi</span><span>${p.progress}%</span></div><div class="progress-bar"><div class="progress-fill" style="width:${p.progress}%;background:${projColorVar(p.color)}"></div></div></div>
+      <div class="pc-meta"><span>📋 ${p.tasks}</span><span>⚠️ ${p.issues}</span><div class="avatars" style="margin-left:auto">${p.members.map(m=>`<div class="avatar">${m}</div>`).join('')}</div></div>
+    </div>`).join('');
+}
+
+function renderTasks() {
+  const canAdd = can('canAddTask');
+  const canEdit = can('canEditTask');
+  document.getElementById('add-task-btn').style.display = canAdd?'':'none';
+  const board=document.getElementById('task-board');
+  board.innerHTML=columns.map((col,ci)=>{
+    const colTasks=tasks.filter(t=>t.col===ci+1);
+    return `<div class="task-col">
+      <div class="col-header"><div class="col-title"><span style="width:8px;height:8px;border-radius:50%;background:${colColors[ci]};display:inline-block"></span>${col}</div><span class="col-count">${colTasks.length}</span></div>
+      <div class="col-tasks" id="col-${ci+1}">
+        ${colTasks.map(t=>{
+          const au=userById(t.assignedTo);
+          return `<div class="task-card" ${canEdit?`draggable="true" ondragstart="dragStart(event,${t.id})"`:''} ondragover="dragOver(event)" ondrop="drop(event,${ci+1})">
+            <div class="task-title">${t.title}</div>
+            <div class="task-meta"><span class="priority prio-${t.prio}">${prioLabel(t.prio)}</span><span class="task-date">📅 ${t.date}</span></div>
+            ${au?`<div class="task-assigned">👤 ${au.fname} ${au.lname[0]}.</div>`:''}
+          </div>`;}).join('')}
+      </div>
+      ${canAdd?`<button class="add-task-btn" onclick="openTaskModal(${ci+1})">+ Shto detyrë</button>`:''}
+    </div>`;}).join('');
+}
+
+function renderPlans() {
+  document.getElementById('upload-plan-btn').style.display = can('canUploadPlan')?'':'none';
+  document.getElementById('plans-grid').innerHTML=plans.map((p,i)=>`
+    <div class="plan-card">
+      <div class="plan-thumb">
+        <svg width="160" height="120" viewBox="0 0 160 120" style="opacity:.4">
+          <rect x="10" y="10" width="60" height="40" fill="none" stroke="#4f80ff" stroke-width="1.5"/>
+          <rect x="90" y="10" width="60" height="40" fill="none" stroke="#4f80ff" stroke-width="1.5"/>
+          <rect x="10" y="70" width="60" height="40" fill="none" stroke="#4f80ff" stroke-width="1.5"/>
+          <rect x="90" y="70" width="60" height="40" fill="none" stroke="#4f80ff" stroke-width="1.5"/>
+          <line x1="70" y1="30" x2="90" y2="30" stroke="#4f80ff" stroke-width="1"/>
+          <line x1="70" y1="90" x2="90" y2="90" stroke="#4f80ff" stroke-width="1"/>
+          <circle cx="${20+i*18}" cy="${20+i*7}" r="5" fill="var(--red)" opacity=".8"/>
+          <circle cx="${80+i*8}" cy="${60+i*5}" r="5" fill="var(--green)" opacity=".8"/>
+        </svg>
+        <div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.6);padding:3px 8px;border-radius:4px;font-size:11px;color:var(--text2)">${p.version}</div>
+      </div>
+      <div class="plan-info">
+        <div class="plan-name">${p.name}</div>
+        <div class="plan-sub">Përditësuar: ${p.updated}</div>
+        <div class="plan-pins">${p.open>0?`<span class="pin-badge pin-open">🔴 ${p.open} hapur</span>`:''}<span class="pin-badge pin-closed">🟢 ${p.closed} mbyllur</span></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderTeam() {
+  const canMng = can('canManageTeam');
+  document.getElementById('add-member-btn').style.display = canMng?'':'none';
+  document.getElementById('team-grid').innerHTML=members.map(m=>`
+    <div class="member-card">
+      <div class="member-avatar" style="background:${m.color}22;color:${m.color}">${m.initials}</div>
+      <div><div class="member-name">${m.name}</div><div class="member-role">${m.role}</div><div class="member-status ${m.status==='away'?'away':''}">${m.status==='online'?'Online':'Larg'}</div></div>
+    </div>`).join('');
+}
+
+function renderUsers() {
+  if(!can('canManageUsers')){
+    document.getElementById('users-content').innerHTML=`<div class="access-denied"><div class="icon">🔒</div><h3>Akses i kufizuar</h3><p>Vetëm administratorët mund të menaxhojnë përdoruesit.</p></div>`;
+    return;
+  }
+  document.getElementById('users-badge').textContent=users.length;
+  document.getElementById('users-content').innerHTML=`
+    <div class="users-table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Përdoruesi</th>
+            <th>Email</th>
+            <th>Roli</th>
+            <th>Statusi</th>
+            <th>U krijua</th>
+            <th>Veprime</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${users.map(u=>`
+          <tr>
+            <td>
+              <div class="user-cell">
+                <div class="avatar" style="background:${avatarColors[u.id%avatarColors.length]};width:32px;height:32px;font-size:12px">${initials(u)}</div>
+                <div>
+                  <div style="font-weight:600">${fullname(u)}</div>
+                  ${u.id===currentUser.id?'<div style="font-size:11px;color:var(--accent)">● Ju</div>':''}
+                </div>
+              </div>
+            </td>
+            <td style="color:var(--text2)">${u.email}</td>
+            <td><span class="role-tag ${roleColors[u.role]}">${roleLabels[u.role]}</span></td>
+            <td>
+              <span style="font-size:13px">
+                <span class="status-dot ${u.status==='active'?'status-active':'status-inactive'}"></span>
+                ${u.status==='active'?'Aktiv':'Çaktivizuar'}
+              </span>
+            </td>
+            <td style="color:var(--text2)">${u.created}</td>
+            <td>
+              <div class="table-actions">
+                <button class="icon-btn" onclick="openEditUserModal(${u.id})" title="Ndrysho">✏️</button>
+                ${u.id!==currentUser.id?`
+                  <button class="icon-btn" onclick="toggleUserStatus(${u.id})" title="${u.status==='active'?'Çaktivizo':'Aktivizo'}">${u.status==='active'?'🔒':'🔓'}</button>
+                  <button class="icon-btn del" onclick="deleteUser(${u.id})" title="Fshi">🗑️</button>
+                `:''}
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ============================================================
+// USER ACTIONS
+// ============================================================
+function toggleUserStatus(id) {
+  const u = users.find(u=>u.id===id);
+  if(!u) return;
+  u.status = u.status==='active'?'inactive':'active';
+  renderUsers();
+  showToast(u.status==='active'?'Llogaria u aktivizua.':'Llogaria u çaktivizua.','ℹ️');
+}
+
+function deleteUser(id) {
+  if(!confirm('Jeni të sigurt që doni të fshini këtë përdorues?')) return;
+  users = users.filter(u=>u.id!==id);
+  renderUsers();
+  showToast('Përdoruesi u fshi.','🗑️');
+}
+
+// ============================================================
+// DRAG & DROP
+// ============================================================
+let draggedId = null;
+function dragStart(e,id){draggedId=id;e.dataTransfer.effectAllowed='move';}
+function dragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
+function drop(e,colIdx){
+  e.preventDefault();
+  if(draggedId===null||!can('canEditTask')) return;
+  const t=tasks.find(t=>t.id===draggedId);
+  if(t){t.col=colIdx;renderTasks();showToast('Detyra u zhvendos!');}
+  draggedId=null;
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal() {
+  if(currentView==='tasks'&&can('canAddTask')) openTaskModal();
+  else if(currentView==='projects'&&can('canAddProject')) openProjectModal();
+  else if(currentView==='team'&&can('canManageTeam')) openTeamModal();
+  else if(currentView==='dashboard') openTaskModal();
+}
+
+function showModal(title,body,saveLabel='Ruaj',noFooter=false){
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-body').innerHTML=body;
+  document.getElementById('modal-footer').style.display=noFooter?'none':'flex';
+  document.getElementById('modal-save-btn').textContent=saveLabel;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function openTaskModal(colIdx=1){
+  currentModal='task';
+  const userOpts = users.filter(u=>u.status==='active').map(u=>`<option value="${u.id}">${fullname(u)}</option>`).join('');
+  showModal('Detyrë e Re',`
+    <div class="field"><label>Titulli</label><input type="text" id="f-title" placeholder="p.sh. Kontrollo armaturën..."></div>
+    <div class="field-row">
+      <div class="field"><label>Projekti</label><select id="f-proj">${projects.map(p=>`<option>${p.name}</option>`).join('')}</select></div>
+      <div class="field"><label>Prioriteti</label><select id="f-prio"><option value="high">Lartë</option><option value="med" selected>Mesme</option><option value="low">Ulët</option></select></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Kolona</label><select id="f-col">${columns.map((c,i)=>`<option value="${i+1}" ${i+1===colIdx?'selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Afati</label><input type="date" id="f-date" value="2026-06-15"></div>
+    </div>
+    <div class="field"><label>Cakto tek</label><select id="f-assign"><option value="">— Pa caktim —</option>${userOpts}</select></div>
+    <div class="field"><label>Përshkrimi</label><textarea id="f-desc" placeholder="Detaje shtesë..."></textarea></div>
+  `);
+}
+
+function openProjectModal(){
+  currentModal='project';
+  showModal('Projekt i Ri',`
+    <div class="field"><label>Emri i Projektit</label><input type="text" id="f-pname" placeholder="p.sh. Kompleksi Rezidencial..."></div>
+    <div class="field"><label>Vendndodhja</label><input type="text" id="f-ploc" placeholder="Qytet, Shqipëri"></div>
+    <div class="field-row">
+      <div class="field"><label>Statusi</label><select id="f-pstatus"><option value="active">Aktiv</option><option value="paused">Pezulluar</option></select></div>
+      <div class="field"><label>Data e Fillimit</label><input type="date" id="f-pdate" value="2026-06-10"></div>
+    </div>
+    <div class="field"><label>Përshkrimi</label><textarea id="f-pdesc" placeholder="Rreth projektit..."></textarea></div>
+  `);
+}
+
+function openTeamModal(){
+  currentModal='member';
+  showModal('Shto Anëtar',`
+    <div class="field-row">
+      <div class="field"><label>Emri</label><input type="text" id="f-mname" placeholder="Emri Mbiemri"></div>
+      <div class="field"><label>Iniciales</label><input type="text" id="f-minit" placeholder="EM" maxlength="2"></div>
+    </div>
+    <div class="field"><label>Roli</label><input type="text" id="f-mrole" placeholder="p.sh. Inxhinier Civil"></div>
+    <div class="field"><label>Email</label><input type="email" id="f-memail" placeholder="emri@kompania.al"></div>
+  `);
+}
+
+function openAddUserModal(){
+  currentModal='adduser';
+  editingUserId=null;
+  showModal('Shto Përdorues të Ri',`
+    <div class="field-row">
+      <div class="field"><label>Emri</label><input type="text" id="f-ufname" placeholder="Emri"></div>
+      <div class="field"><label>Mbiemri</label><input type="text" id="f-ulname" placeholder="Mbiemri"></div>
+    </div>
+    <div class="field"><label>Email</label><input type="email" id="f-uemail" placeholder="emri@kompania.al"></div>
+    <div class="field"><label>Fjalëkalimi</label><input type="password" id="f-upass" placeholder="Min. 6 karaktere"></div>
+    <div class="field"><label>Roli</label>
+      <select id="f-urole">
+        <option value="admin">🔑 Admin</option>
+        <option value="manager" selected>👷 Menaxher</option>
+        <option value="worker">🔧 Punonjës</option>
+        <option value="viewer">👁️ Vëzhgues</option>
+      </select>
+    </div>
+    <div class="field"><label>Statusi</label>
+      <select id="f-ustatus"><option value="active">Aktiv</option><option value="inactive">Çaktivizuar</option></select>
+    </div>
+  `,'Krijo Llogarinë');
+}
+
+function openEditUserModal(id){
+  currentModal='edituser';
+  editingUserId=id;
+  const u=users.find(u=>u.id===id);
+  if(!u) return;
+  showModal('Ndrysho Përdoruesin',`
+    <div class="field-row">
+      <div class="field"><label>Emri</label><input type="text" id="f-ufname" value="${u.fname}"></div>
+      <div class="field"><label>Mbiemri</label><input type="text" id="f-ulname" value="${u.lname}"></div>
+    </div>
+    <div class="field"><label>Email</label><input type="email" id="f-uemail" value="${u.email}"></div>
+    <div class="field"><label>Fjalëkalimi i Ri (opsional)</label><input type="password" id="f-upass" placeholder="Lër bosh për të mbajtur të njëjtin"></div>
+    <div class="field"><label>Roli</label>
+      <select id="f-urole">
+        <option value="admin" ${u.role==='admin'?'selected':''}>🔑 Admin</option>
+        <option value="manager" ${u.role==='manager'?'selected':''}>👷 Menaxher</option>
+        <option value="worker" ${u.role==='worker'?'selected':''}>🔧 Punonjës</option>
+        <option value="viewer" ${u.role==='viewer'?'selected':''}>👁️ Vëzhgues</option>
+      </select>
+    </div>
+    <div class="field"><label>Statusi</label>
+      <select id="f-ustatus">
+        <option value="active" ${u.status==='active'?'selected':''}>Aktiv</option>
+        <option value="inactive" ${u.status==='inactive'?'selected':''}>Çaktivizuar</option>
+      </select>
+    </div>
+  `,'Ruaj Ndryshimet');
+}
+
+function openProfileModal(){
+  currentModal='profile';
+  const u=currentUser;
+  showModal('Ndrysho Profilin',`
+    <div class="field-row">
+      <div class="field"><label>Emri</label><input type="text" id="f-pfname" value="${u.fname}"></div>
+      <div class="field"><label>Mbiemri</label><input type="text" id="f-plname" value="${u.lname}"></div>
+    </div>
+    <div class="field"><label>Email</label><input type="email" id="f-pemail" value="${u.email}"></div>
+  `);
+}
+
+function openPasswordModal(){
+  currentModal='password';
+  showModal('Ndrysho Fjalëkalimin',`
+    <div class="field"><label>Fjalëkalimi Aktual</label><input type="password" id="f-oldpass" placeholder="••••••••"></div>
+    <div class="field"><label>Fjalëkalimi i Ri</label><input type="password" id="f-newpass" placeholder="Min. 6 karaktere"></div>
+    <div class="field"><label>Konfirmo</label><input type="password" id="f-confpass" placeholder="Përsërit fjalëkalimin e ri"></div>
+  `,'Ndrysho');
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+
+function saveModal(){
+  if(currentModal==='task'){
+    const title=document.getElementById('f-title')?.value.trim();
+    if(!title){alert('Shto titullin!');return;}
+    const assignVal=document.getElementById('f-assign')?.value;
+    tasks.push({id:Date.now(),title,col:parseInt(document.getElementById('f-col').value),prio:document.getElementById('f-prio').value,date:new Date(document.getElementById('f-date').value).toLocaleDateString('sq-AL',{day:'numeric',month:'short'}),proj:document.getElementById('f-proj').value,assignedTo:assignVal?parseInt(assignVal):null});
+    document.getElementById('pending-count').textContent=tasks.filter(t=>t.col<4).length;
+    document.getElementById('nav-tasks-badge').textContent=tasks.filter(t=>t.col<4).length;
+    if(currentView==='tasks')renderTasks();
+    if(currentView==='dashboard')renderDashboard();
+  } else if(currentModal==='project'){
+    const name=document.getElementById('f-pname')?.value.trim();
+    if(!name){alert('Shto emrin!');return;}
+    const cols=['blue','green','orange','purple'];
+    projects.push({id:Date.now(),name,location:document.getElementById('f-ploc').value||'Shqipëri',status:document.getElementById('f-pstatus').value,progress:0,color:cols[projects.length%4],tasks:0,issues:0,members:['AK']});
+    if(currentView==='projects')renderProjects();
+    if(currentView==='dashboard')renderDashboard();
+  } else if(currentModal==='member'){
+    const name=document.getElementById('f-mname')?.value.trim();
+    if(!name){alert('Shto emrin!');return;}
+    const clrs=['#4f80ff','#22c55e','#f59e0b','#ef4444','#7c5cfc','#f97316'];
+    members.push({name,role:document.getElementById('f-mrole').value||'Anëtar',initials:(document.getElementById('f-minit').value.toUpperCase()||name.substring(0,2).toUpperCase()),color:clrs[members.length%clrs.length],status:'online'});
+    renderTeam();
+  } else if(currentModal==='adduser'){
+    const fname=document.getElementById('f-ufname')?.value.trim();
+    const lname=document.getElementById('f-ulname')?.value.trim();
+    const email=document.getElementById('f-uemail')?.value.trim().toLowerCase();
+    const pass=document.getElementById('f-upass')?.value;
+    if(!fname||!lname){alert('Emri dhe mbiemri janë të detyrueshëm!');return;}
+    if(!email||!/\S+@\S+\.\S+/.test(email)){alert('Email i pavlefshëm!');return;}
+    if(pass.length<6){alert('Fjalëkalimi duhet të ketë min. 6 karaktere!');return;}
+    if(users.find(u=>u.email.toLowerCase()===email)){alert('Ky email ekziston tashmë!');return;}
+    users.push({id:Date.now(),fname,lname,email,pass,role:document.getElementById('f-urole').value,status:document.getElementById('f-ustatus').value,created:new Date().toLocaleDateString('sq-AL')});
+    renderUsers();
+  } else if(currentModal==='edituser'){
+    const u=users.find(u=>u.id===editingUserId);
+    if(!u) return;
+    u.fname=document.getElementById('f-ufname')?.value.trim()||u.fname;
+    u.lname=document.getElementById('f-ulname')?.value.trim()||u.lname;
+    u.email=document.getElementById('f-uemail')?.value.trim()||u.email;
+    const np=document.getElementById('f-upass')?.value;
+    if(np&&np.length>=6) u.pass=np;
+    u.role=document.getElementById('f-urole')?.value||u.role;
+    u.status=document.getElementById('f-ustatus')?.value||u.status;
+    if(u.id===currentUser.id){currentUser=u;setupAppForUser();}
+    renderUsers();
+  } else if(currentModal==='profile'){
+    const fn=document.getElementById('f-pfname')?.value.trim();
+    const ln=document.getElementById('f-plname')?.value.trim();
+    const em=document.getElementById('f-pemail')?.value.trim();
+    if(!fn||!ln){alert('Emri dhe mbiemri janë të detyrueshëm!');return;}
+    currentUser.fname=fn; currentUser.lname=ln; currentUser.email=em;
+    const ui=users.find(u=>u.id===currentUser.id);
+    if(ui){ui.fname=fn;ui.lname=ln;ui.email=em;}
+    setupAppForUser();
+  } else if(currentModal==='password'){
+    const old=document.getElementById('f-oldpass')?.value;
+    const nw=document.getElementById('f-newpass')?.value;
+    const cf=document.getElementById('f-confpass')?.value;
+    if(old!==currentUser.pass){alert('Fjalëkalimi aktual është i gabuar!');return;}
+    if(nw.length<6){alert('Fjalëkalimi i ri duhet të ketë min. 6 karaktere!');return;}
+    if(nw!==cf){alert('Fjalëkalimet nuk përputhen!');return;}
+    currentUser.pass=nw;
+    const ui=users.find(u=>u.id===currentUser.id);
+    if(ui) ui.pass=nw;
+    showToast('Fjalëkalimi u ndryshua! 🔒');
+    closeModal(); return;
+  }
+  closeModal();
+  showToast('U ruajt me sukses! ✅');
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+function handleSearch(q){
+  if(!q){if(currentView==='tasks')renderTasks();return;}
+  if(currentView==='tasks'){
+    const filtered=tasks.filter(t=>t.title.toLowerCase().includes(q.toLowerCase()));
+    document.getElementById('task-board').innerHTML=columns.map((col,ci)=>{
+      const ct=filtered.filter(t=>t.col===ci+1);
+      return `<div class="task-col"><div class="col-header"><div class="col-title"><span style="width:8px;height:8px;border-radius:50%;background:${colColors[ci]};display:inline-block"></span>${col}</div><span class="col-count">${ct.length}</span></div><div class="col-tasks">${ct.map(t=>`<div class="task-card"><div class="task-title">${t.title}</div><div class="task-meta"><span class="priority prio-${t.prio}">${prioLabel(t.prio)}</span><span class="task-date">📅 ${t.date}</span></div></div>`).join('')}</div></div>`;
+    }).join('');
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg='U ruajt!',icon='✅'){
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-icon').textContent=icon;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Enter key on login
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(document.getElementById('auth-screen').style.display!=='none'){
+      const lt=document.querySelector('.auth-tab.active');
+      if(lt?.textContent.trim()==='Hyr') doLogin(); else doRegister();
+    }
+  }
+});
+
+// ============================================================
+// REPORTS ENGINE
+// ============================================================
+let reportFilters = { fromDate:'', toDate:'', projectId:'' };
+
+function computeReportData() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const fd = reportFilters.fromDate ? new Date(reportFilters.fromDate) : null;
+  const td = reportFilters.toDate   ? new Date(reportFilters.toDate)   : null;
+  const pid = reportFilters.projectId ? parseInt(reportFilters.projectId) : null;
+
+  function parseDate(s) {
+    if(!s) return null;
+    const d = new Date(s);
+    return isNaN(d) ? null : d;
+  }
+
+  const activeUsers = users.filter(u => u.status === 'active');
+  const userPerfs = [];
+
+  for (const u of activeUsers) {
+    let uTasks = tasks.filter(t => t.assignedTo === u.id);
+    if(pid) uTasks = uTasks.filter(t => t.proj === projects.find(p=>p.id===pid)?.name);
+    if(fd)  uTasks = uTasks.filter(t => { const d=parseDate(t.date); return !d || d >= fd; });
+    if(td)  uTasks = uTasks.filter(t => { const d=parseDate(t.date); return !d || d <= td; });
+    if(!uTasks.length) continue;
+
+    const total       = uTasks.length;
+    const open        = uTasks.filter(t=>t.col===1).length;
+    const inProgress  = uTasks.filter(t=>t.col===2).length;
+    const review      = uTasks.filter(t=>t.col===3).length;
+    const closed      = uTasks.filter(t=>t.col===4).length;
+    const overdue     = uTasks.filter(t => t.col!==4 && t.date && parseDate(t.date) && parseDate(t.date) < today).length;
+    const compRate    = total ? Math.round(closed/total*100) : 0;
+    const hpClosed    = uTasks.filter(t=>t.prio==='high'&&t.col===4).length;
+    const hpOpen      = uTasks.filter(t=>t.prio==='high'&&t.col!==4).length;
+    const projs       = [...new Set(uTasks.map(t=>t.proj))];
+    const color       = avatarColors[u.id % avatarColors.length];
+
+    userPerfs.push({ u, total, open, inProgress, review, closed, overdue, compRate, hpClosed, hpOpen, projs, color, tasks: uTasks });
+  }
+
+  const totalT  = userPerfs.reduce((a,p)=>a+p.total,0);
+  const totalC  = userPerfs.reduce((a,p)=>a+p.closed,0);
+  const totalO  = userPerfs.reduce((a,p)=>a+p.overdue,0);
+  const overall = totalT ? Math.round(totalC/totalT*100) : 0;
+
+  return { userPerfs, totalT, totalC, totalO, overall };
+}
+
+function renderReports() {
+  if(!can('canManageUsers') && currentUser?.role !== 'manager') {
+    // workers see their own report only
+    renderUserDetail(currentUser.id);
+    return;
+  }
+  document.getElementById('reports-detail').style.display='none';
+  document.getElementById('reports-main').style.display='block';
+  const { userPerfs, totalT, totalC, totalO, overall } = computeReportData();
+
+  const mainEl = document.getElementById('reports-main');
+  mainEl.innerHTML = `
+    <!-- Controls -->
+    <div class="report-controls">
+      <label>Nga:</label>
+      <input type="date" id="rc-from" value="${reportFilters.fromDate}" onchange="reportFilters.fromDate=this.value;renderReports()">
+      <label>Deri:</label>
+      <input type="date" id="rc-to" value="${reportFilters.toDate}" onchange="reportFilters.toDate=this.value;renderReports()">
+      <div class="rc-sep"></div>
+      <label>Projekti:</label>
+      <select id="rc-proj" onchange="reportFilters.projectId=this.value;renderReports()">
+        <option value="">— Të gjitha —</option>
+        ${projects.map(p=>`<option value="${p.id}" ${reportFilters.projectId==p.id?'selected':''}>${p.name}</option>`).join('')}
+      </select>
+      <div class="rc-sep"></div>
+      <button class="btn btn-ghost" onclick="reportFilters={fromDate:'',toDate:'',projectId:''};renderReports()">↺ Pastro</button>
+      <button class="btn btn-primary" style="margin-left:auto" onclick="exportCSV()">⬇ Eksporto CSV</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="sum-card">
+        <div class="sum-icon blue">📋</div>
+        <div><div class="sum-val blue">${totalT}</div><div class="sum-lbl">Detyra Totale</div></div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon green">✅</div>
+        <div><div class="sum-val green">${totalC}</div><div class="sum-lbl">Të Mbyllura</div></div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon red">⚠️</div>
+        <div><div class="sum-val red">${totalO}</div><div class="sum-lbl">Të Vonuara</div></div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-icon yellow">📊</div>
+        <div><div class="sum-val yellow">${overall}%</div><div class="sum-lbl">Shkalla e Përfundimit</div></div>
+      </div>
+    </div>
+
+    <!-- Leaderboard Table -->
+    <div class="perf-table-wrap">
+      <div class="perf-table-header">
+        <div class="perf-table-title">🏆 Performanca e Ekipit</div>
+        <div style="font-size:12px;color:var(--text2)">${userPerfs.length} punonjës aktiv</div>
+      </div>
+      ${userPerfs.length === 0 ? `<div style="padding:40px;text-align:center;color:var(--text2)">Nuk ka të dhëna për filtrat e zgjedhur.</div>` : `
+      <table class="perf-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Punonjësi</th>
+            <th>Detyrat</th>
+            <th>Shkalla e Përfundimit</th>
+            <th>Të Vonuara</th>
+            <th>Prioritet i Lartë</th>
+            <th>Projektet</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${[...userPerfs].sort((a,b)=>b.compRate-a.compRate).map((p,i)=>{
+            const rank = i+1;
+            const rankCls = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-n';
+            const barColor = p.compRate>=80?'var(--green)':p.compRate>=50?'var(--yellow)':'var(--red)';
+            return `<tr>
+              <td><div class="rank-badge ${rankCls}">${rank<=3?['🥇','🥈','🥉'][rank-1]:rank}</div></td>
+              <td>
+                <div class="user-cell">
+                  <div class="avatar" style="background:${p.color};width:32px;height:32px;font-size:12px">${initials(p.u)}</div>
+                  <div>
+                    <div style="font-weight:600">${fullname(p.u)}</div>
+                    <div style="font-size:11px;color:var(--text2)">${roleLabels[p.u.role]}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="mini-breakdown">
+                  <span class="mb-chip mb-open">H:${p.open}</span>
+                  <span class="mb-chip mb-prog">P:${p.inProgress}</span>
+                  <span class="mb-chip mb-rev">R:${p.review}</span>
+                  <span class="mb-chip mb-done">M:${p.closed}</span>
+                  ${p.overdue>0?`<span class="mb-chip mb-over">⚠${p.overdue}</span>`:''}
+                </div>
+              </td>
+              <td>
+                <div class="perf-bar-wrap">
+                  <div class="perf-bar-bg"><div class="perf-bar-fill" style="width:${p.compRate}%;background:${barColor}"></div></div>
+                  <div class="perf-bar-label" style="color:${barColor}">${p.compRate}%</div>
+                </div>
+              </td>
+              <td><span style="color:${p.overdue>0?'var(--red)':'var(--green)';};font-weight:600">${p.overdue}</span></td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <span class="mb-chip mb-done" title="Të mbyllura">✓ ${p.hpClosed}</span>
+                  ${p.hpOpen>0?`<span class="mb-chip mb-over" title="Hapur">! ${p.hpOpen}</span>`:''}
+                </div>
+              </td>
+              <td><div class="proj-tags">${p.projs.slice(0,2).map(pr=>`<span class="proj-tag">${pr}</span>`).join('')}${p.projs.length>2?`<span class="proj-tag">+${p.projs.length-2}</span>`:''}</div></td>
+              <td><button class="icon-btn" onclick="renderUserDetail(${p.u.id})" title="Detajet">🔍</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`}
+    </div>
+  `;
+}
+
+function renderUserDetail(userId) {
+  const perf = computeReportData().userPerfs.find(p=>p.u.id===userId);
+  if(!perf && currentUser.id !== userId) { showToast('Nuk ka të dhëna.','⚠️'); return; }
+
+  // for workers with no tasks
+  const p = perf || { u: currentUser, total:0, open:0, inProgress:0, review:0, closed:0, overdue:0, compRate:0, hpClosed:0, hpOpen:0, projs:[], color: avatarColors[currentUser.id%avatarColors.length], tasks:[] };
+
+  document.getElementById('reports-main').style.display = can('canManageUsers') ? 'block' : 'none';
+  const det = document.getElementById('reports-detail');
+  det.style.display = 'block';
+
+  const barColor = p.compRate>=80?'var(--green)':p.compRate>=50?'var(--yellow)':'var(--red)';
+
+  det.innerHTML = `
+    ${can('canManageUsers') ? `<div class="back-btn" onclick="det.style.display='none';document.getElementById('reports-main').style.display='block'">← Kthehu tek ekipi</div>` : ''}
+    <div class="user-detail-card">
+      <div class="udc-top">
+        <div class="udc-avatar" style="background:${p.color}22;color:${p.color}">${initials(p.u)}</div>
+        <div>
+          <div class="udc-name">${fullname(p.u)}</div>
+          <div class="udc-meta">${p.u.email} &nbsp;·&nbsp; <span class="role-tag ${roleColors[p.u.role]}">${roleLabels[p.u.role]}</span></div>
+          <div class="proj-tags" style="margin-top:8px">${p.projs.map(pr=>`<span class="proj-tag">📁 ${pr}</span>`).join('')}</div>
+        </div>
+      </div>
+      <div class="udc-stats">
+        <div class="udc-stat">
+          <div class="udc-stat-val" style="color:var(--accent)">${p.total}</div>
+          <div class="udc-stat-lbl">Totale</div>
+        </div>
+        <div class="udc-stat">
+          <div class="udc-stat-val" style="color:${barColor}">${p.compRate}%</div>
+          <div class="udc-stat-lbl">Përfundim</div>
+        </div>
+        <div class="udc-stat">
+          <div class="udc-stat-val" style="color:var(--red)">${p.overdue}</div>
+          <div class="udc-stat-lbl">Të Vonuara</div>
+        </div>
+        <div class="udc-stat">
+          <div class="udc-stat-val" style="color:var(--yellow)">${p.hpOpen}</div>
+          <div class="udc-stat-lbl">HP Hapur</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bar full -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:600">Shpërndarje Detyrave</div>
+        <div style="font-size:13px;color:var(--text2)">${p.total} totale</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+        ${[
+          {label:'Hapur',val:p.open,color:'var(--text2)'},
+          {label:'Në Progres',val:p.inProgress,color:'var(--accent)'},
+          {label:'Rishikim',val:p.review,color:'var(--yellow)'},
+          {label:'Mbyllur',val:p.closed,color:'var(--green)'},
+        ].map(s=>`
+          <div style="text-align:center;background:var(--surface2);border-radius:8px;padding:12px">
+            <div style="font-size:20px;font-weight:700;color:${s.color}">${s.val}</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:3px">${s.label}</div>
+          </div>`).join('')}
+      </div>
+      <div style="background:var(--surface3);border-radius:6px;height:10px;overflow:hidden;display:flex;">
+        ${p.total>0?`
+          <div style="width:${p.open/p.total*100}%;background:var(--text3);height:100%;transition:width .5s" title="Hapur"></div>
+          <div style="width:${p.inProgress/p.total*100}%;background:var(--accent);height:100%;transition:width .5s" title="Në Progres"></div>
+          <div style="width:${p.review/p.total*100}%;background:var(--yellow);height:100%;transition:width .5s" title="Rishikim"></div>
+          <div style="width:${p.closed/p.total*100}%;background:var(--green);height:100%;transition:width .5s" title="Mbyllur"></div>
+        `:''}
+      </div>
+      <div style="display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--text2)">
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--text3);margin-right:4px"></span>Hapur</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:4px"></span>Në Progres</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--yellow);margin-right:4px"></span>Rishikim</span>
+        <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--green);margin-right:4px"></span>Mbyllur</span>
+      </div>
+    </div>
+
+    <!-- Task List -->
+    <div class="perf-table-wrap">
+      <div class="perf-table-header">
+        <div class="perf-table-title">Lista e Detyrave</div>
+        <div style="font-size:12px;color:var(--text2)">${p.tasks.length} detyra</div>
+      </div>
+      ${p.tasks.length===0?`<div style="padding:40px;text-align:center;color:var(--text2)">Nuk ka detyra të caktuara.</div>`:`
+      <table class="perf-table">
+        <thead>
+          <tr>
+            <th>Titulli</th>
+            <th>Projekti</th>
+            <th>Statusi</th>
+            <th>Prioriteti</th>
+            <th>Afati</th>
+            <th>Vonesa</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${p.tasks.map(t=>{
+            const colLabels=['','Hapur','Në Progres','Rishikim','Mbyllur'];
+            const colColors2=['','var(--text3)','var(--accent)','var(--yellow)','var(--green)'];
+            const today2=new Date(); today2.setHours(0,0,0,0);
+            let dueDate=null; try{dueDate=new Date(t.date);}catch(e){}
+            const isOverdue = t.col!==4 && dueDate && dueDate < today2;
+            return `<tr>
+              <td style="font-weight:500">${t.title}</td>
+              <td style="color:var(--text2)">${t.proj}</td>
+              <td><span style="color:${colColors2[t.col]};font-size:12px;font-weight:600">● ${colLabels[t.col]}</span></td>
+              <td><span class="priority prio-${t.prio}">${prioLabel(t.prio)}</span></td>
+              <td style="color:var(--text2);font-size:12px">${t.date||'—'}</td>
+              <td>${isOverdue?'<span style="color:var(--red);font-size:12px;font-weight:600">⚠ Po</span>':'<span style="color:var(--green);font-size:12px">✓</span>'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`}
+    </div>
+  `;
+
+  // fix back-btn inline reference
+  det.querySelector('.back-btn')?.addEventListener('click', ()=>{
+    det.style.display='none';
+    document.getElementById('reports-main').style.display='block';
+  });
+}
+
+function exportCSV() {
+  const { userPerfs } = computeReportData();
+  const rows = [['Emri','Email','Roli','Totale','Hapur','Në Progres','Rishikim','Mbyllur','Të Vonuara','% Përfundim','HP Hapur','HP Mbyllur','Projektet']];
+  for(const p of userPerfs) {
+    rows.push([fullname(p.u), p.u.email, p.u.role, p.total, p.open, p.inProgress, p.review, p.closed, p.overdue, p.compRate+'%', p.hpOpen, p.hpClosed, p.projs.join('; ')]);
+  }
+  const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `raport-performance-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('CSV u eksportua!','📊');
+}
+</script>
+</body>
+</html>
